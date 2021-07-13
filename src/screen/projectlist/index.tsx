@@ -7,9 +7,14 @@ import { Button, Typography } from "antd"
 import { useProjects } from "../../utils/project"
 import { useUsers } from "../../utils/user"
 import { useProjectSearchParms } from "./util"
-import { Row } from "../../components/lib"
+import { ButtonNoPadding, Row } from "../../components/lib"
+import { useDispatch } from "react-redux"
+import { projectListActions } from "./project-list.slice"
 
-export const ProjectListScreen = (props:{projectButton:JSX.Element}) =>{
+export const ProjectListScreen = () =>{
+
+    const dispatch = useDispatch()
+
     //渲染用户
     const [param,setParam] = useProjectSearchParms()
     //利用自定义节流hook处理输入
@@ -18,12 +23,14 @@ export const ProjectListScreen = (props:{projectButton:JSX.Element}) =>{
     return <Container>
         <Row between={true}>
             <h1>项目列表</h1>
-           {props.projectButton}
+            {
+            <ButtonNoPadding onClick={()=>dispatch(projectListActions.openProjectModal())} type={"link"}>创建项目</ButtonNoPadding>
+            }
         </Row>
        
         <SearchPanel users={users||[]} param={param} setParam={setParam} />
         {error?<Typography.Text type={"danger"}>{error.message}</Typography.Text>:null}
-        <List projectButton={props.projectButton} refresh={retry} loading={isLoading} users={users||[]} dataSource ={list || []}/>
+        <List refresh={retry} loading={isLoading} users={users||[]} dataSource ={list || []}/>
     </Container>
 }
 
