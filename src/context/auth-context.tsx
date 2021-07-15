@@ -1,7 +1,8 @@
 import React,{ReactNode, useState,useContext, useEffect} from 'react'
+import { useQueryClient } from 'react-query'
 import * as auth from '../auth-provider'
 import { FullPageLoading ,FullPageError} from '../components/lib'
-import {User} from '../screen/projectlist/searchPanel'
+import { User } from "../types/user"
 import { http } from '../utils/http'
 import { useAsync } from '../utils/use-async'
 interface AuthForm {
@@ -33,9 +34,15 @@ export const AuthProvider = ({children}:{children:ReactNode})=>{
     //useState用的是泛型，会看传入的initialState的类型\
     const {data:user,error,isLoading,isIdle,isError,run,setData:setUser} = useAsync<User|null>()
 
+    const queryClient = useQueryClient()
+
     const login = (form:AuthForm)=>auth.login(form).then(user=>setUser(user))
     const register = (form:AuthForm)=>auth.register(form).then(user=>setUser(user))
-    const logout = ()=>auth.logout().then(()=>setUser(null))
+    const logout = ()=>auth.logout().then(()=>{
+        
+        setUser(null)
+        queryClient.clear()
+    })
 
     useEffect(()=>{
         run(bootstrapUser())

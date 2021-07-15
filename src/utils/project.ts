@@ -1,49 +1,63 @@
-import { ObjectCleanEmpty } from './index';
-import { useAsync } from './use-async';
+import { QueryKey } from 'react-query';
+import { useEditConfig, useAddConfig, useDeleteConfig } from './use-optimistic-options';
+import { useProjectSearchParms } from './../screen/projectlist/util';
 import { useHttp } from './http';
-import { Project } from './../screen/projectlist/list';
-import React,{useCallback, useEffect} from "react"
+import { Project } from "../types/project";
+import React from "react"
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 export const useProjects = (param?:Partial<Project>)=>{
-    const {run,...result} = useAsync<Project[]>()
+   
     const client = useHttp()
-    //渲染列表
-    const fetchProjects = useCallback(
-        ()=>client('projects',{data:ObjectCleanEmpty(param||{})}),
-        [client,param])
-    useEffect(()=>{
-        run(fetchProjects(),{
-            retry:fetchProjects
-        })
-    },[param,run,fetchProjects])
-    return result
+
+    //利用react-query改造原来的请求
+    //useQuery的第一个参数可以为一个tuple，意思里面的值变化时，就会重新出发后面的请求
+    return useQuery<Project[]>(['projects',param],()=>client('projects',{data:param}))  //这里的泛型定义返回值的类型
 }
 
-export const useEditProject=()=>{
-    const {run,...asyncResult} = useAsync()
+
+export const useEditProject=(queryKey:QueryKey)=>{
     const client = useHttp()
-    const mutate = (params:Partial<Project>)=>{
-        return run(client(`projects/${params.id}`,{
+    return useMutation(
+        (params:Partial<Project>)=>client(`projects/${params.id}`,{
             data:params,
             method:'PATCH'
-        }))
-    }
-    return {
-        mutate,
-        ...asyncResult
-    }
+        }),
+        useEditConfig(queryKey)
+    )
 }
-export const useAddProject=()=>{
-    const {run,...asyncResult} = useAsync()
+
+
+
+export const useAddProject=(queryKey:QueryKey)=>{
     const client = useHttp()
-    const mutate = (params:Partial<Project>)=>{
-        run(client(`projects/${params.id}`,{
+    //useMutation执行某个方法，成功或者失败之后让缓存某些数据失效
+    return useMutation(
+        (params:Partial<Project>)=>client(`projects`,{
             data:params,
             method:'POST'
-        }))
-    }
-    return {
-        mutate,
-        ...asyncResult
-    }
+        }),  
+        useAddConfig(queryKey)
+    )
+}
+
+export const useDeleteProject=(queryKey:QueryKey)=>{
+    const client = useHttp()
+    //useMutation执行某个方法，成功或者失败之后让缓存某些数据失效
+    return useMutation(
+        ({id}:{id:number})=>client(`projects/${id}`,{
+            method:'DELETE'
+        }),  
+        useDeleteConfig(queryKey)
+    )
+}
+
+export const useProject = (id?:number) =>{
+    const client = useHttp()
+    //useQuery中第三个参数为配置参数，在此处表示只有当id有意义时候才执行请求
+    return useQuery<Project>(
+        ['project',{id}],
+        ()=>client(`projects/${id}`),
+        {enabled:Boolean(id)}
+    )
 }

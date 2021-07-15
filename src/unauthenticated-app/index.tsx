@@ -7,6 +7,7 @@ import left from '../assets/left.svg'
 import right from '../assets/right.svg'
 import { Typography } from 'antd'
 import { useDocumentTitle } from '../utils'
+import { ErrorBox } from '../components/lib'
 export const UnauthenticatedApp = ()=>{
     const [isRegister,setIsRegister] = useState(false)
     const [error,setError] = useState<Error | null>(null)
@@ -21,7 +22,7 @@ export const UnauthenticatedApp = ()=>{
                         isRegister?'请登录':'请注册'
                     }
                 </Title>
-                {error?<Typography.Text type={"danger"}>{error.message}</Typography.Text>:null}
+                <ErrorBox error={error} />
                 {
                     isRegister?<LoginScreen onError={setError}/>:<RegisterScreen onError={setError} />
                 }

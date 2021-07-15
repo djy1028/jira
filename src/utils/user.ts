@@ -2,7 +2,7 @@ import { ObjectCleanEmpty } from './index';
 import { useAsync } from './use-async';
 import { useHttp } from './http';
 import React,{useEffect} from 'react'
-import { User } from './../screen/projectlist/searchPanel';
+import { User } from "../types/user";
 export const  useUsers = (param?:Partial<User>)=>{
     const {run,...result} = useAsync<User[]>()
     const client = useHttp()

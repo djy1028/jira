@@ -6,24 +6,26 @@ import styled from "@emotion/styled"
 import { Button, Typography } from "antd"
 import { useProjects } from "../../utils/project"
 import { useUsers } from "../../utils/user"
-import { useProjectSearchParms } from "./util"
-import { Row } from "../../components/lib"
+import { useProjectModal, useProjectSearchParms } from "./util"
+import { ButtonNoPadding, ErrorBox, Row } from "../../components/lib"
 
-export const ProjectListScreen = (props:{projectButton:JSX.Element}) =>{
+export const ProjectListScreen = () =>{
     //渲染用户
     const [param,setParam] = useProjectSearchParms()
     //利用自定义节流hook处理输入
-    const {isLoading,error,data:list,retry} = useProjects(useDebounce(param,500))
+    const {isLoading,error,data:list} = useProjects(useDebounce(param,500))
     const {data:users} = useUsers()
+
+    const {open} = useProjectModal()
     return <Container>
         <Row between={true}>
             <h1>项目列表</h1>
-           {props.projectButton}
+            <ButtonNoPadding type={'link'} onClick={open}>创建项目</ButtonNoPadding>
         </Row>
        
         <SearchPanel users={users||[]} param={param} setParam={setParam} />
-        {error?<Typography.Text type={"danger"}>{error.message}</Typography.Text>:null}
-        <List projectButton={props.projectButton} refresh={retry} loading={isLoading} users={users||[]} dataSource ={list || []}/>
+        <ErrorBox error={error} />
+        <List loading={isLoading} users={users||[]} dataSource ={list || []}/>
     </Container>
 }
 

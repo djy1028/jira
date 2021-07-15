@@ -1,35 +1,29 @@
 import { Dropdown, Table, TableProps,Menu } from 'antd'
 import dayjs from 'dayjs'
 import React from 'react'
-import {User} from './searchPanel'
+import { User } from "../../types/User"
 import {Link} from 'react-router-dom'
 import { Pin } from '../../components/pin'
-import { useEditProject } from '../../utils/project'
+import { useDeleteProject, useEditProject } from '../../utils/project'
 import { ButtonNoPadding } from '../../components/lib'
-
-export interface Project{
-    id:number
-    name:string
-    personId:number
-    pin:boolean
-    organization:string
-    created:string
-}
+import { useProjectModal, useProjectsQueryKey } from './util'
+import {Modal} from 'antd'
+import { Project } from '../../types/project'
 
 interface ListProps extends TableProps<Project>{
     users:User[],
-    refresh?:()=>void,
-    projectButton:JSX.Element
+    refresh?:()=>void
 }
 
 export const List = ({users,...props}:ListProps) =>{
-    const {mutate} = useEditProject()
+    const {mutate} = useEditProject(useProjectsQueryKey())
+ 
     return <Table pagination={false} columns={[
         {
             title:<Pin checked={true} disabled={true} />,
             render(value,project){
                 return<Pin checked={project.pin} onCheckedChange={
-                    pin=>{mutate({id:project.id,pin}).then(props.refresh)}
+                    pin=>{mutate({id:project.id,pin})}
                 }/>
             }
 
@@ -59,17 +53,35 @@ export const List = ({users,...props}:ListProps) =>{
             }
         },{
             render(value,project){
-                return <Dropdown overlay={
-                    <Menu>
-                        <Menu.Item key={'edit'}>
-                            {/* <ButtonNoPadding type={'link'} onClick={()=>props.setProjectModalOpen(true)}>编辑</ButtonNoPadding> */}
-                        </Menu.Item>
-                    </Menu>}>
-                    <ButtonNoPadding type={"link"}>...</ButtonNoPadding>
-                </Dropdown>
+                return (<More project={project} />)
             }
         }
     ]} {...props}>
       
     </Table>
+}
+
+const More = ({project}:{project:Project})=>{
+    const {startEdit} = useProjectModal()
+    const editProject = (id:number)=>()=>startEdit(id)
+    const {mutate:deleteProject} = useDeleteProject(useProjectsQueryKey())
+    const confirmDeleteProject = (id:number)=>{
+        Modal.confirm({
+            title:'确定删除这个项目吗？',
+            content:'点击确定删除',
+            okText:'确定',
+            onOk(){
+                deleteProject({id})
+            }
+        })
+    }   
+    return <Dropdown overlay={
+        <Menu>
+            <Menu.Item key={'edit'} onClick={editProject(project.id)}>编辑
+
+            </Menu.Item>
+            <Menu.Item key={'delete'} onClick={()=>confirmDeleteProject(project.id)} >删除</Menu.Item>
+        </Menu>}>
+        <ButtonNoPadding type={"link"}>...</ButtonNoPadding>
+    </Dropdown>
 }

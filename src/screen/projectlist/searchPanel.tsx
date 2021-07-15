@@ -2,17 +2,9 @@
 import {jsx} from '@emotion/react'
 import React from "react"
 import {Input,Form} from 'antd'
-import { Project } from './list'
+import { Project } from "../../types/project"
 import { UserSelect } from '../../components/user-select'
-export interface User{
-    id:number
-    name:string
-    title:string
-    email:string
-    organization:string
-    token:string
-}
-
+import { User } from '../../types/user'
 //组件属性介绍说明
 interface SearchPanelProps{
     users:User[],
