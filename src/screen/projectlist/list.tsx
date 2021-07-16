@@ -1,7 +1,7 @@
 import { Dropdown, Table, TableProps,Menu } from 'antd'
 import dayjs from 'dayjs'
 import React from 'react'
-import { User } from "../../types/User"
+import { User } from "../../types/user"
 import {Link} from 'react-router-dom'
 import { Pin } from '../../components/pin'
 import { useDeleteProject, useEditProject } from '../../utils/project'

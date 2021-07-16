@@ -82,7 +82,9 @@ const HeadRight = styled.div`
 `
 
 const Main = styled.main`
-height:calc(100vh - 6rem)
+height:calc(100vh - 6rem);
+display: flex;
+overflow: hidden;
 `
 
 /* 熟悉grid布局 （以圣杯布局为例）*/

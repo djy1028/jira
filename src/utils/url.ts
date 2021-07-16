@@ -27,3 +27,15 @@ export const useUrlQueryParam = <K extends string>(keys:K[])=>{
   as const 用来固定死tuple中的类型定义
 */
 // const a = ['jack',12,{gender:'male'}] as const
+
+export const useSetUrlSearchParam = () => {
+    const [searchParams, setSearchParam] = useSearchParams();
+    return (params: { [key in string]: unknown }) => {
+      const o = ObjectCleanEmpty({
+        ...Object.fromEntries(searchParams),
+        ...params,
+      }) as URLSearchParamsInit;
+      return setSearchParam(o);
+    };
+  };
+  
