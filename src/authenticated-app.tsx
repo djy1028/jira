@@ -12,6 +12,7 @@ import {Routes,Route,Navigate} from 'react-router'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { ProjectModal } from './screen/projectlist/project-modal'
 import { ProjectPopover } from './components/project-popover'
+import { UserPopover } from './components/user-popover'
 
 // grid和flex各自的应用场景
 // 1、考虑是一维布局还是二维布局，一般来说，一维用flex,二维用grid
@@ -47,7 +48,7 @@ const PageHeader = ()=>{
                 <SoftwareLogo width={'18rem'} color={'rgb(18,132,255)'}/>
            </ButtonNoPadding>
            <ProjectPopover />
-            <span>用户</span>
+           <UserPopover/>
         </HeadLeft>
         <HeadRight> 
             <Dropdown overlay={

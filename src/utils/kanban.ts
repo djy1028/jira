@@ -1,7 +1,7 @@
 import { useHttp } from './http';
 import { Kanban } from './../types/kanban';
 import { QueryKey, useMutation, useQuery } from 'react-query';
-import { useAddConfig } from './use-optimistic-options';
+import { useAddConfig, useDeleteConfig, useReorderConfig } from './use-optimistic-options';
 export const useKanbans = (param?:Partial<Kanban>)=>{
    
     const client = useHttp()
@@ -20,5 +20,39 @@ export const useAddKanban=(queryKey:QueryKey)=>{
             method:'POST'
         }),  
         useAddConfig(queryKey)
+    )
+}
+
+export const useDeleteKanban=(queryKey:QueryKey)=>{
+    const client = useHttp()
+    //useMutation执行某个方法，成功或者失败之后让缓存某些数据失效
+    return useMutation(
+        ({id}:{id:number})=>client(`kanbans/${id}`,{
+            method:'DELETE' 
+        }),  
+        useDeleteConfig(queryKey)
+    )
+}
+
+export interface SortProps{
+    type:'before'|'after';
+    referenceId:number;
+    fromId:number,
+
+    
+    fromKanbanId?:number,
+    toKanbanId?:number
+}
+
+export const useRecorderKanban=(queryKey:QueryKey)=>{
+    const client = useHttp()
+    return useMutation(
+        (params:SortProps)=>{
+            return client('kanbans/recorder',{
+                data:params,
+                method:'POST'
+            })
+        },
+        useReorderConfig(queryKey)
     )
 }
