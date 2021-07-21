@@ -1,5 +1,4 @@
 import { useHttp } from './http';
-import React from 'react'
 import { User } from "../types/user";
 import { useQuery } from 'react-query';
 

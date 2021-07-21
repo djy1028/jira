@@ -34,20 +34,6 @@ export const useDebounce = <V>(value:V,delay?:number)=>{
     return debouncedValue
 }
 
-// export const useArray = <T>(initialArray:T[])=>{
-//     const [value,setValue] = useState(initialArray)
-//     return {
-//         value,
-//         setValue,
-//         add:(item:T)=>setValue([...value,item]),
-//         clear:()=>setValue([]),
-//         removeImte:(index:number)=>{
-//             const copy = [...value]
-//             copy.splice(index,1)
-//             setValue(copy)
-//         }  
-//     }
-// }
 //自定义title的hooks
 export const useDocumentTitle = (title:string,keepOnUmount:boolean=true)=>{
     const oldTitle = useRef(document.title).current

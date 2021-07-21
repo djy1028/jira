@@ -8,8 +8,12 @@ export const LoginScreen = ({onError}:{onError:(error:Error)=>void}) =>{
     const {run,isLoading} = useAsync(undefined,{throwNewError:true})
     const handleSubmit = async (values:{username:string,password:string})=>{
        
+
+        //try catch是同步的，所以catch里面是无法捕获异步操作login里面返回的错误，所以需要加上async await进行处理
         try{
-          await run(login(values))
+
+            //这里通过run来设置isloading的状态
+           await run(login(values))
         }
         catch(e){
             onError(e)

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Divider, List, Popover, Typography} from "antd"
+import {List, Popover, Typography} from "antd"
 import styled from '@emotion/styled'
 import { useUsers } from '../utils/user'
 

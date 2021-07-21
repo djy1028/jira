@@ -7,6 +7,8 @@ export const RegisterScreen =({onError}:{onError:(error:Error)=>void}) =>{
     const {register} = useAuth()
     const {run,isLoading} = useAsync(undefined,{throwNewError:true})
     const handleSubmit = async ({cpassword,...values}:{username:string,password:string,cpassword:string})=>{
+
+        //确认密码功能
         if(cpassword !== values.password){
             onError(new Error('请确认两次输入的密码相同'))
             return

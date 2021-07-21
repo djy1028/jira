@@ -10,10 +10,12 @@ interface paraConfig extends RequestInit{
     data?:object 
 }
 
-//未登录状态下使用
+
+//通用的http异步请求方法。未登录状态下使用,封装http，方便每次调用时候带上token
 export const http = (endpoint:string,{data,token,headers,...customConfig}:paraConfig={})=>{
 
     const config = {
+        //method默认为get
         method:"GET",
         headers:{
             Authorization:token?`Bearer ${token}`:'',
@@ -21,12 +23,16 @@ export const http = (endpoint:string,{data,token,headers,...customConfig}:paraCo
         },
         ...customConfig
     }
+    //区分fetch 在get 和post下的请求头
     if(config.method.toUpperCase() === 'GET'){
         endpoint += `?${qs.stringify(data)}`
     }
     else{
         config.body = JSON.stringify(data || {})
     }
+
+    //axios和fetch的表现不一样，axios可以直接返回不为2xx的异常，而fetch只有在网络异常时候才会抛出，其余异常代码情况不会抛出异常
+
     return fetch(`${apiUrl}/${endpoint}`,config).then(async response=>{
         //没有权限的情况下
         if(response.status === 401){
@@ -38,7 +44,7 @@ export const http = (endpoint:string,{data,token,headers,...customConfig}:paraCo
         if(response.ok){
             return data
         }
-        //返回数据不ok时候，需要手动抛出异常
+        //fetch的api 返回数据不ok时候并不会抛出异常，需要手动抛出异常
         else{
             return Promise.reject(data)
         }
@@ -47,29 +53,48 @@ export const http = (endpoint:string,{data,token,headers,...customConfig}:paraCo
 }
 
 
-//已经登录状态下使用
-export const useHttp = ()=>{
-    const {user} = useAuth()
-    // return ([endpoint,config]:[string,paraConfig])=>http(endpoint,{...config,token:user.token})
-    //复用参数类型的方法,ts中的utility types
 
-    //utility type用法：用泛型给它传入一个其他类型，然后utility type 对这个类型进行某种操作
+//http封装fetch，但是仍然需要手动写入token,这里需要一个自动带入token的方法,读取user中的token
+
+//已经登录状态下使用
+
+//返回一个函数，外部直接调用这个函数，再对调用的结果进行传参
+export const useHttp = ()=>{
+
+    //利用context,整个程序中都可以获取user
+    const {user} = useAuth()   
+
+
 
     //这里的typeof是ts中静态的typeof而不是js中runtime的typeof
     //每次调用返回一个新的函数，其他地方存在对这个hooks的依赖，需要用useCallback对其返回函数进行包裹
+
     return useCallback((...[endpoint,config]:Parameters<typeof http>)=>http(endpoint,{...config,token:user?.token}),[user?.token])
 }
 
-//interface可以在很多情况下和类型别名互换,区别type可以用作联合、交叉类型及utility type，interface做不到
-// interface Person{
+//复用参数类型的方法,ts中的utility types
+//utility type用法：用泛型给它传入一个其他类型，然后utility type 对这个类型进行某种操作
+
+
+//类型别名可以有助于复用类型定义
+// type Person = {   
 //     name:string
 //     age:number
 // }
 
-// type Person = {   //类型别名可以有助于服用类型定义
+
+//interface可以在很多情况下和类型别名互换,区别type可以用作联合、交叉类型及utility type，interface做不到
+// type Person = {
 //     name:string
 //     age:number
 // }
+// const xiaom:Partial<Person>={name:'ss'}
+
+
+
+
+
+
 
 // type PersonKeys = keyof Person
 

@@ -1,5 +1,7 @@
 import { useMountedRef } from './index';
 import React,{useCallback, useReducer, useState} from "react"
+
+//stat反应useAsync异步操作的状态
 interface State<D>{
     error:Error | null
     data:D | null
@@ -42,11 +44,12 @@ export const useAsync = <D>(initialState?:State<D>,initialConfig?:typeof default
     const safeDispatch = useSafeDispatch(dispatch)
 
     const setData = useCallback(
+        
         (data:D)=>safeDispatch({
-        data,
-        stat:'success',
-        error:null
-    })
+            data,
+            stat:'success',
+            error:null
+        })
     ,[safeDispatch])
 
     const setError = useCallback( 
@@ -56,27 +59,37 @@ export const useAsync = <D>(initialState?:State<D>,initialConfig?:typeof default
             data:null
         })
     ,[safeDispatch])
-    //用来出发异步请求
+    
     //其他地方需要在useEffect的依赖中加入run，这边需要用useCallback对run进行优化处理
+
+
+    //run函数用来触发异步请求,参数是一个promise
     const run = useCallback((promise:Promise<D>,runConfig?:{retry:()=>Promise<D>})=>{
         if(!promise || !promise.then()){
+            //throw error会打断一切的进程
             throw new Error('请传入promise类型数据')
         }
+
+
         //存一个函数，因此oldpromise也就存下来了
         if(runConfig?.retry){
             setRetry(()=>()=>run(runConfig?.retry(),runConfig))
         }
-        //为了避免需要在依赖中加入state，在setState时候需要以函数的形式来更新state
-        //这里的preState是当前的state
+
+        //异步刚开始时需要设置一个loading
         safeDispatch({stat:'loading'})
+
         return promise.then(data=>{
             //阻止在已经卸载的组件上设置数据的错位行为
-          
+
+            //异步操作成功返回时设置数据
             setData(data)
             return data
         }).catch(err=>{
+
+            //catch会消化异常，如果不主动抛出，外面是接受不到异常的
             setError(err)
-            if(config.throwNewError)return Promise.reject(err)
+            // if(config.throwNewError) return Promise.reject(err)
             return err
         })
     },[config.throwNewError, setData,setError,safeDispatch])

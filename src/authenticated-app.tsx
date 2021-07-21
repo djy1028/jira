@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import React, { useState } from 'react'
+import React from 'react'
 import { ButtonNoPadding, Row } from './components/lib'
 import { useAuth } from './context/auth-context'
 import {ProjectScreen} from './screen/project/index'
@@ -14,11 +14,7 @@ import { ProjectModal } from './screen/projectlist/project-modal'
 import { ProjectPopover } from './components/project-popover'
 import { UserPopover } from './components/user-popover'
 
-// grid和flex各自的应用场景
-// 1、考虑是一维布局还是二维布局，一般来说，一维用flex,二维用grid
-// 2、考虑从内容出发还是从布局出发？
-//     从内容出发，数量不固定，用flex
-//     从布局出发（数量固定），先规划网格，再填充元素用grid
+
 
 export const AuthenticatedApp = ()=>{
     useDocumentTitle("项目列表")
@@ -40,6 +36,7 @@ export const AuthenticatedApp = ()=>{
 }
 
 const PageHeader = ()=>{
+    //从全局context中读取logout user
     const {logout,user} = useAuth()
     return (
         <Head between={true}>
@@ -67,7 +64,7 @@ const PageHeader = ()=>{
 
 const Container = styled.div`
 display: grid;
-grid-template-rows: 6rem calc(100vh - 6rem);
+grid-template-rows: 6rem calc(100vh - 6rem); //从上到下的比例占用
 height:100vh
 `
 const Head = styled(Row)`
@@ -86,7 +83,15 @@ const Main = styled.main`
 height:calc(100vh - 6rem);
 display: flex;
 overflow: hidden;
+
 `
+
+// grid和flex各自的应用场景
+// 1、考虑是一维布局还是二维布局，一般来说，一维用flex,二维用grid
+// 2、考虑从内容出发还是从布局出发？
+//     从内容出发，数量不固定，用flex
+//     从布局出发（数量固定），先规划网格，再填充元素用grid
+
 
 /* 熟悉grid布局 （以圣杯布局为例）*/
 
